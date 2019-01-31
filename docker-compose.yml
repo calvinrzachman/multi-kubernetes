@@ -1,0 +1,50 @@
+version: "3"
+# Services/Containers
+services:
+  postgres:
+    image: "postgres:latest"
+  redis:
+    image: "redis:latest"
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - /app/node_modules # Do not overide the node_modules in the container. Leave as is
+      - ./server:/app # Copy everything from teh 'server' directory into the containers app directory
+      # The server will get redirected back to the working server dirctory
+      # This allows for autoupdating without rebuilds
+    environment:
+      - REDIS_HOST=redis # Connects to Docker Container running redis by name (matches Docker Compose file)
+      - REDIS_PORT=6379
+      - PG_USER=postgres # PostGres Login
+      - PG_HOST=postgres # Connects to Docker Container running Postgres by name (matches Docker Compose file)
+      - PG_DATABASE=postgres # Name of db inside Postgres we are connecting to
+      - PG_PASSWORD=postgres_password,
+      - PG_PORT=5432
+      # In general get these variables from the documentation
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - "3050:80"
+# We want to use Docker Compose for networking between containers
