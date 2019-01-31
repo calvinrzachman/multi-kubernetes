@@ -12,4 +12,4 @@ RUN npm install
 COPY ./ ./ 
 
 # Tell image what to do on container start
-RUN ["npm", "run", "start"]
+CMD ["npm", "run", "start"]
