@@ -1,0 +1,31 @@
+# Travis CI Configuration
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t czachman/react-test -f ./client/Dockerfile.dev ./client
+  # build other projects here
+
+# Test Running Section - any exit codes other than 0 --> test failed
+script:
+  - docker run czachman/react-test npm run test -- --coverage
+  # -- --coverage ensures jest testing suite does not hang in watch mode
+  # Add additional tests here
+
+# Build Production Images and push to Docker Hub
+after_success:
+  - docker build -t czachman/multi-client ./client
+  - docker build -t czachman/multi-server ./server
+  - docker build -t czachman/multi-nginx ./nginx
+  - docker build -t czachman/multi-worker ./worker
+  # Login to Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # grabs environment variable and sends it in stdin to the next command
+  # --password-stdin tells docker to look for password in stdin
+
+  # Push images to Docker Hub
+  - docker push czachman/multi-client
+  - docker push czachman/multi-server
+  - docker push czachman/multi-nginx
+  - docker push czachman/multi-worker
