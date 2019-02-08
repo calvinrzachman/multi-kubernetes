@@ -29,17 +29,16 @@ after_success:
   - docker push czachman/multi-server
   - docker push czachman/multi-nginx
   - docker push czachman/multi-worker
-
 # Deploy to AWS Elastic Beanstalk
-deploy:
-  provider: elasticbeanstalk
-  region: "us-east-2"
-  app: "multi-docker"
-  env: MultiDocker-env
-  bucket_name: "elasticbeanstalk-us-east-2-279274087707"
-  bucket_path: "multi-docker"
-  on:
-    branch: master
-  access_key_id: "$AWS_ACCESS_KEY"
-  secret_access_key:
-    secure: "$AWS_SECRET_KEY"
+# deploy:
+#   provider: elasticbeanstalk
+#   region: "us-east-2"
+#   app: "multi-docker"
+#   env: MultiDocker-env
+#   bucket_name: "elasticbeanstalk-us-east-2-279274087707"
+#   bucket_path: "multi-docker"
+#   on:
+#     branch: master
+#   access_key_id: "$AWS_ACCESS_KEY"
+#   secret_access_key:
+#     secure: "$AWS_SECRET_KEY"
