@@ -1,0 +1,12 @@
+# Kubernetes ClusterIP Service Configuration
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector: # Tell this service which set of Pods its supposed to provide access too (use label)
+    component: server
+  ports:
+    - port: 5000 # Service Port: Gives other pods access to the Pods of this Service
+      targetPort: 5000 # Express server hard coded to listen on this port

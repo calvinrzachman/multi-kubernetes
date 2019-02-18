@@ -1,0 +1,21 @@
+# Kubernetes Deployment Configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: web
+  template:
+    metadata:
+      labels:
+        component: web
+        # Match selector and template label
+    spec:
+      containers:
+        - name: client
+          image: czachman/multi-client
+          ports:
+            - containerPort: 3000

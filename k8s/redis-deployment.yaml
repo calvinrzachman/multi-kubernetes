@@ -1,0 +1,25 @@
+# Kubernetes Deployment Configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+# Specify how the Deployment behaves
+spec:
+  # Define the number of pods
+  replicas: 1
+  # Define set of Pods to be controlled
+  selector:
+    matchLabels:
+      component: redis
+  # Define Pod Template
+  template:
+    metadata:
+      labels:
+        component: redis
+    # Customize Pod Behavior
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - containerPort: 6379 # Defualt port for Redis

@@ -1,0 +1,41 @@
+# # Kubernetes Deployment Configuration
+## This is an example to show how to consolidate config files
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: server-deployment
+# # Specify how the Deployment behaves
+# spec:
+#   # Define the number of pods
+#   replicas: 3
+#   # Define set of Pods to be controlled
+#   selector:
+#   matchLabels:
+#     component: server # This can be anything, "part of app: api" for example
+#   # Define Pod Template
+#   template:
+#     metadata:
+#       labels: # Must match label in spec
+#         component: server
+#     # Customize Pod Behavior
+#     spec:
+#       containers:
+#         - name: server
+#           image: czachman/multi-server
+#           ports:
+#             - containerPort: 5000
+#           # Add on required environment variables (in this case for PG and Redis)
+# ---
+# # Kubernetes ClusterIP Service Configuration
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: client-cluster-ip-service
+# spec:
+#   type: ClusterIP
+#   selector:
+#     component: web
+#   ports:
+#     - port: 3000 # Service Port: Gives other pods access to the Pods of this Service
+#       targetPort: 3000 # Container Port: Send any incoming traffic to port 3000 inside pods of this Service

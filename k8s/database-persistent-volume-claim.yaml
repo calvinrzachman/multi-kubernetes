@@ -1,0 +1,18 @@
+# Kubernetes Persistent Volume Claim (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-persistent-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce # Can be used by a single node
+    # - ReadOnlyMany # Multiple nodes can read
+    # - ReadWriteMany # Multiple nodes can read and write
+  resources:
+    requests:
+      storage: 2Gi
+# We will attach a PVC to a Pod Configuration
+# Kubernetes will try to find a storage (static or dynamic PVC) to meet that request
+
+# Compare and Contrast Volume and Persistent Volume - PV is stored outside of Pod and will
+# remain in the event of Pod crash/restart

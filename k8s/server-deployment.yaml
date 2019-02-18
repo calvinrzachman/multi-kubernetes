@@ -1,0 +1,44 @@
+# Kubernetes Deployment Configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+# Specify how the Deployment behaves
+spec:
+  # Define the number of pods
+  replicas: 3
+  # Define set of Pods to be controlled
+  selector:
+    matchLabels:
+      component: server # This can be anything, "part of app: api" for example
+  # Define Pod Template (1 pod per deployment)
+  template:
+    metadata:
+      labels: # Must match label in spec
+        component: server
+    # Customize Pod Behavior
+    spec:
+      containers:
+        - name: server
+          image: czachman/multi-server
+          ports:
+            - containerPort: 5000
+          # Add on required environment variables (in this case for PG and Redis)
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: "6379" # environment variables MUST be a string
+            - name: PG_USER
+              value: postgres
+            - name: PG_HOST
+              value: postgres-cluster-ip-service
+            - name: PG_PORT
+              value: "5432"
+            - name: PG_DATABASE
+              value: postgres
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword # Matches the name given in the 'kubectl create secret' command
+                  key: PG_PASSWORD # The keyvalue pair we want

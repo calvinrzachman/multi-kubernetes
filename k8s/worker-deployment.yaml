@@ -1,0 +1,32 @@
+# Kubernetes Deployment Configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+# Specify how the Deployment behaves
+spec:
+  # Define the number of pods
+  replicas: 1
+  # Define set of Pods to be controlled
+  selector:
+    matchLabels:
+      component: worker
+  # Define Pod Template
+  template:
+    metadata:
+      labels: # Must match label in spec
+        component: worker
+    # Customize Pod Behavior
+    spec:
+      containers:
+        - name: worker
+          image: czachman/multi-worker
+          # Add on required environment variables (in this case for PG and Redis)
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service # Matches the name of the ClusterIP defined for Redis
+            - name: REDIS_PORT
+              value: "6379"
+# There is no other service/container that needs to directly connect to the 'worker' portion
+# of the application. As a result, the worker deployment does not need ports or an associated ClusterIP
+# service

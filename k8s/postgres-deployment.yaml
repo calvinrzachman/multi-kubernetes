@@ -1,0 +1,43 @@
+# Kubernetes Deployment Configuration
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+# Specify how the Deployment behaves
+spec:
+  # Define the number of pods
+  replicas: 1
+  # Define set of Pods to be controlled
+  selector:
+    matchLabels:
+      component: postgres
+  # Define Pod Template
+  template:
+    metadata:
+      labels:
+        component: postgres
+    # Customize Pod Behavior
+    spec:
+      volumes:
+        # Specify that we need storage as specified by the PVC Object below
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          env:
+            # Tell Postgres to make use of custom password
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PG_PASSWORD
+          ports:
+            - containerPort: 5432 # Default port for Postgres
+          # Assign Volume for use by container
+          volumeMounts:
+            - name: postgres-storage # matches the name of the desired volume entry
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres # Data will be stored in this folder in the persistent volume
+
