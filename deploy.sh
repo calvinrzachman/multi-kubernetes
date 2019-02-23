@@ -13,7 +13,7 @@ docker push czachman/multi-server:$SHA
 docker push czachman/multi-worker:$SHA
 
 # Apply Configuration to Cluster
-kubectl apply -f /k8s
+kubectl apply -f k8s
 
 # Imperatively set the latest image on each Deployment
 kubectl set image deployments/client-deployment client=czachman/multi-client:$SHA # Tell client container to use this image
