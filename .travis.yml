@@ -17,7 +17,7 @@ before_install:
   - source $HOME/google-cloud-sdk/path.bash.inc # Applies additional config for GC from this file
   - gcloud components update kubectl
   # Google Cloud Authorization (Give Travis access to GC account)
-  - gcloud auth active-service-account --key-file service-account.json # File containing SENSITIVE credentials
+  - gcloud auth activate-service-account --key-file service-account.json # File containing SENSITIVE credentials
   # Google Cloud Configuration
   - gcloud config set project multi-kubernetes-232122 #project name
   - gcloud config set compute/zone us-central1-a # set location of datacenter
