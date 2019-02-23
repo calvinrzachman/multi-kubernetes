@@ -3,17 +3,33 @@ sudo: required
 services:
   - docker
 
+env:
+  global:
+    # Get the current git version and assign to environment variable
+    - SHA=$(git rev-parse HEAD)
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1 # Configure GC to disable prompts for user info
+
 before_install:
-  # Download and Install Google Cloud SDK
+  # Unencrypt service-account file for Google Cloud IAM
   - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
+  # Download and Install Google Cloud SDK
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc # Applies additional config for GC from this file
   - gcloud components update kubectl
   # Google Cloud Authorization (Give Travis access to GC account)
   - gcloud auth active-service-account --key-file service-account.json # File containing SENSITIVE credentials
+  # Google Cloud Configuration
+  - gcloud config set project multi-kubernetes-232122 #project name
+  - gcloud config set compute/zone us-central1-a # set location of datacenter
+  - gcloud container clusters get-credentials standard-cluster-1 # cluster name
 
+  # Docker CLI Login
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # the above command assumes that we have env variables set for username and password
+
+  # Build test version of multi-client image
   - docker build -t czachman/react-test -f ./client/Dockerfile.dev ./client
-  # build other projects here
+  # ... build other projects here
 
 # Test Running Section - any exit codes other than 0 --> test failed
 script:
@@ -22,24 +38,28 @@ script:
   # Add additional tests here
 
 # Build Production Images and push to Docker Hub
-after_success:
-  - docker build -t czachman/multi-client ./client
-  - docker build -t czachman/multi-server ./server
-  - docker build -t czachman/multi-nginx ./nginx
-  - docker build -t czachman/multi-worker ./worker
-  # Login to Docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # grabs environment variable and sends it in stdin to the next command
-  # --password-stdin tells docker to look for password in stdin
+# after_success:
+#   - docker build -t czachman/multi-client ./client
+#   - docker build -t czachman/multi-server ./server
+#   - docker build -t czachman/multi-nginx ./nginx
+#   - docker build -t czachman/multi-worker ./worker
+#   # Login to Docker CLI
+#   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+#   # grabs environment variable and sends it in stdin to the next command
+#   # --password-stdin tells docker to look for password in stdin
 
-  # Push Images to Docker Hub
-  - docker push czachman/multi-client
-  - docker push czachman/multi-server
-  - docker push czachman/multi-nginx
-  - docker push czachman/multi-worker
-# Deploy to AWS Elastic Beanstalk
-# deploy:
-#   provider: elasticbeanstalk
+#   # Push Images to Docker Hub
+#   - docker push czachman/multi-client
+#   - docker push czachman/multi-server
+#   - docker push czachman/multi-nginx
+#   - docker push czachman/multi-worker
+# Deploy
+deploy:
+  provider: script
+  script: bash ./deploy.sh # Bash Script for Deployment
+  on:
+    branch: master
+    # provider: elasticbeanstalk
 #   region: "us-east-2"
 #   app: "multi-docker"
 #   env: MultiDocker-env
