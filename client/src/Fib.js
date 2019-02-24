@@ -25,6 +25,7 @@ class Fib extends Component {
   }
 
   renderSeenIndexes() {
+    console.log("[INSIDE renderSeenIndexes()]", this.state.seenIndexes);
     if (
       this.state &&
       this.state.seenIndexes &&
