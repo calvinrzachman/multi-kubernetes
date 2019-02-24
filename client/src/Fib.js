@@ -21,9 +21,11 @@ class Fib extends Component {
   componentDidMount() {
     this.fetchValues();
     this.fetchIndexes();
+    console.log("[INSIDE componentDidMount()]", this.state.values);
   }
 
   renderSeenIndexes() {
+    console.log("[INSIDE renderSeenIndexes()]", this.state.seenIndexes);
     return this.state.seenIndexes.map(({ number }) => number).join(", ");
   }
 
@@ -55,6 +57,7 @@ class Fib extends Component {
   };
 
   render() {
+    console.log("WE ARE RENDERING FIB");
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
@@ -71,7 +74,7 @@ class Fib extends Component {
         {this.renderSeenIndexes()}
 
         <h3>Calculated Values:</h3>
-        {this.renderValues()}
+        {/* {this.renderValues()} */}
       </div>
     );
   }
